@@ -4,3 +4,4 @@ __pycache__/
 .env
 py-go.pem
 .venv/
+launch.json
