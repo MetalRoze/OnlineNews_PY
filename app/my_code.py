@@ -1,7 +1,5 @@
 import requests
-import re
 from .extract import TextRank, RawTagger
-import sys
 import logging
 
 # def my_function():
@@ -32,12 +30,20 @@ def get_article(article_id):
 
 def save_keywords(article_id, keywords):
     logging.info(keywords)
-    # url = f"http://3.35.255.194:8080/api/article/{article_id}/keywords"
-    # response = requests.post(url, json={"keywords": keywords})
-    # if response.status_code == 200:
-    #     logging.info("키워드 저장 성공")
-    # else:
-    #     raise Exception("Failed to save keywords")
+    url = f"http://3.35.255.194:8080/api/article/{article_id}/keywords"
+    payload = {
+        "articleId": article_id,
+        "keyword": keywords  # 'keyword'로 변경
+    }
+    headers = {'Content-Type': 'application/json'}
+    
+    response = requests.post(url, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        logging.info("키워드 저장 성공")
+    else:
+        logging.error(f"응답 상태 코드: {response.status_code}, 응답 데이터: {response.text}")
+        raise Exception("Failed to save keywords")
 
 
 def process_article(article_id):
