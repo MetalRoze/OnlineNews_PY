@@ -1,7 +1,5 @@
 import networkx
 import re
-import spacy
-
 # 텍스트 전처리용 stop_words 목록
 # stop_words = set([
 #     '>','<'
