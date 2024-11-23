@@ -1,6 +1,7 @@
 import requests
 from .extract import TextRank, RawTagger
 import logging
+import random
 
 # def my_function():
 #     # 여기서 원하는 코드 로직을 실행
@@ -56,6 +57,9 @@ def process_article(article_id):
     tr.load(RawTagger(article_content), lambda w: w not in stopword and (w[1] in ('NNG', 'NNP', 'VV', 'VA')))
     tr.build()
     keywords = tr.extract(0.1)
+    
+    if len(keywords) > 3:
+        keywords = random.sample(keywords, 3)
 
     # 3. 키워드 저장
     save_keywords(article_id, keywords)
