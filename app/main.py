@@ -10,6 +10,8 @@ app = FastAPI()
 
 origins = [
         "http://myeongbo.site",
+        "http://localhost:5173",  # 로컬 개발 환경
+
 ]
 
 # CORS 설정 추가
