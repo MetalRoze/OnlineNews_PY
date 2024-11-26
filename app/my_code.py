@@ -66,3 +66,12 @@ def process_article(article_id):
 
     # 4. 결과 반환
     return keywords
+
+def cal_similarity():
+    url = "http://3.35.255.194:8080/api/article/keywords"
+    response = requests.get(url)
+    logging.info(response)
+    if response.status_code == 200:
+        return response.json()  # 응답 결과를 JSON 형식으로 반환
+    else:
+        raise Exception(f"Failed to fetch keywords. Status code: {response.status_code}")
