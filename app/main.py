@@ -5,13 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.my_code import process_article
 import os
 import uvicorn
+from app.my_code import cal_similarity
 
 app = FastAPI()
 
 origins = [
         "http://myeongbo.site",
         "http://localhost:5173",  # 로컬 개발 환경
-
 ]
 
 # CORS 설정 추가
@@ -38,13 +38,23 @@ def user():
     return {"hi!"}
 
 
-@app.get("/run-my-code/{article_id}")
+@app.get("/pyapi/run-my-code/{article_id}")
 def run_my_code(article_id: int):
     try:
         result = process_article(article_id)  # my_code.py의 process_article 함수 호출
         return {"keywords": result}
     except Exception as e:
         return {"error": str(e)}
+    
+    
+@app.get("/pyapi/calculate")
+def calculate():
+    try:
+        result = cal_similarity()
+        return {"status": "success", "data": result}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+  
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
