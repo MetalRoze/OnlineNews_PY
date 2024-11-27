@@ -50,13 +50,17 @@ def run_my_code(article_id: int):
 @app.get("/pyapi/calculate")
 def calculate():
     try:
-        access_token = get_token()
-        similarity_result = cal_similarity(access_token)
-
+        # 사용자 인증 토큰 가져오기
+        access_token, refresh_token = get_token() 
+        
+        # 코사인 유사도 계산
+        similarity_result = cal_similarity(access_token)  
+        
         return {"status": "success", "data": similarity_result}
+    
     except Exception as e:
         return {"status": "error", "message": str(e)}
-  
+
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
