@@ -67,11 +67,39 @@ def process_article(article_id):
     # 4. 결과 반환
     return keywords
 
-def cal_similarity():
+def cal_similarity(token):
     url = "http://3.35.255.194:8080/api/article/keywords"
     response = requests.get(url)
     logging.info(response)
+    
     if response.status_code == 200:
-        return response.json()  # 응답 결과를 JSON 형식으로 반환
+        USER_KEYWORD_URL = "http://3.35.255.194:8080/api/user/keywords"
+        headers={
+            "Authorization" : f"Bearer {token}"
+        } 
+        
+        keywords_response = requests.get(USER_KEYWORD_URL, headers=headers)
+        return keywords_response.json()
+    
     else:
         raise Exception(f"Failed to fetch keywords. Status code: {response.status_code}")
+    
+def get_token():
+    LOGIN_URL = "http://3.35.255.194:8080/api/user/login"
+    login_payload = {
+        "email" : "test@gmail.com",
+        "password" : "asdf"
+    }
+    headers = {
+        "Content-Type": "application/json"  # 명시적으로 Content-Type 설정
+    }
+    
+    login_response = requests.post(LOGIN_URL, json = login_payload, headers = headers)
+    
+    if login_response.status_code == 200:
+        tokens = login_response.json()
+        access_token = tokens.get("accessToken")
+        return access_token
+    else:
+        logging.error(f"Failed to login. Status code: {login_response.status_code}, Response: {login_response.text}")
+        raise Exception("Failed to login")

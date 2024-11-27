@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.my_code import process_article
 import os
 import uvicorn
-from app.my_code import cal_similarity
+from app.my_code import get_token,cal_similarity
 
 app = FastAPI()
 
@@ -50,8 +50,10 @@ def run_my_code(article_id: int):
 @app.get("/pyapi/calculate")
 def calculate():
     try:
-        result = cal_similarity()
-        return {"status": "success", "data": result}
+        access_token = get_token()
+        similarity_result = cal_similarity(access_token)
+
+        return {"status": "success", "data": similarity_result}
     except Exception as e:
         return {"status": "error", "message": str(e)}
   
