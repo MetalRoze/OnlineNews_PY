@@ -71,22 +71,16 @@ def process_article(article_id):
     # 4. 결과 반환
     return keywords
 
-def cal_similarity(token):
+def cal_similarity(token: str):
     try:
         logging.info(f"Access token used for request: {token}")
-
-        # 토큰 유효성 검사
-        if not is_token_valid(token):
-            logging.info("Access token expired. Attempting to reissue...")
-            _, refresh_token = get_token()
-            token = reissue_token(refresh_token)  # 새 accessToken 발급
 
         # 전체 기사 키워드 가져오기
         ARTICLE_KEYWORD_URL = "http://3.35.255.194:8080/api/article/keywords"
         response = requests.get(ARTICLE_KEYWORD_URL)
 
         if response.status_code != 200:
-            raise Exception(f"Failed to fetch article keywords. Status code: {response.status_code}")
+            raise ValueError(f"Failed to fetch article keywords. Status code: {response.status_code}")
 
         article_keywords = response.json()
 
@@ -104,16 +98,19 @@ def cal_similarity(token):
             if isinstance(user_keywords, list):
                 user_keywords_list = user_keywords
             else:
-                raise Exception("User keywords response is not a list")
+                raise ValueError("User keywords response is not a list")
 
             return rank_articles_by_similarity(article_keywords, user_keywords_list)
         else:
-            raise Exception(f"Failed to fetch user keywords. Status code: {keywords_response.status_code}")
+            raise ValueError(f"Failed to fetch user keywords. Status code: {keywords_response.status_code}")
+
+    except requests.RequestException as e:
+        logging.error(f"Request error in cal_similarity: {e}")
+        raise
 
     except Exception as e:
         logging.error(f"Error in cal_similarity: {e}")
         raise
-
 
     
     

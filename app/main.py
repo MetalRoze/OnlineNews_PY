@@ -1,11 +1,13 @@
 # app/main.py
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.my_code import process_article
 import os
 import uvicorn
 from app.my_code import get_token,cal_similarity
+import logging
+import requests
 
 app = FastAPI()
 
@@ -46,20 +48,40 @@ def run_my_code(article_id: int):
     except Exception as e:
         return {"error": str(e)}
     
-    
-@app.get("/pyapi/calculate")
-def calculate():
+@app.get("/pyapi/calculate/{token}")
+def calculate(token: str):
     try:
-        # 사용자 인증 토큰 가져오기
-        access_token, refresh_token = get_token() 
-        
+        logging.info(f"Received token: {token}")
+
         # 코사인 유사도 계산
-        similarity_result = cal_similarity(access_token)  
-        
+        similarity_result = cal_similarity(token)
+
         return {"status": "success", "data": similarity_result}
-    
+
+    except ValueError as ve:
+        logging.error(f"Validation error: {ve}")
+        return Response(
+            content=f'{{"status": "error", "message": "{str(ve)}"}}',
+            status_code=400,
+            media_type="application/json"
+        )
+
+    except requests.RequestException as re:
+        logging.error(f"Request error: {re}")
+        return Response(
+            content='{"status": "error", "message": "Failed to communicate with external API."}',
+            status_code=502,
+            media_type="application/json"
+        )
+
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        logging.error(f"Unexpected error: {e}")
+        return Response(
+            content='{"status": "error", "message": "Internal server error."}',
+            status_code=500,
+            media_type="application/json"
+        )
+
 
 
 if __name__ == "__main__":
